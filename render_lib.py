@@ -195,6 +195,23 @@ def badge(img, cx, cy, r, c1, c2, style='solid'):
     d = ImageDraw.Draw(img); d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(255, 255, 255, 230), width=int(P(2.5)))
     d.ellipse([cx - r - P(3), cy - r - P(3), cx + r + P(3), cy + r + P(3)], outline=(0, 0, 0, 160), width=int(P(1.5)))
 
+def ua_subtitle(img):
+    """Covers the template's Russian subtitle under the logo and writes it in Ukrainian at the same slant."""
+    W, H = img.size
+    m = layer(W, H); ImageDraw.Draw(m).polygon([(P(40), P(167)), (P(388), P(139)), (P(391), P(171)), (P(43), P(199))], fill=(4, 7, 5, 255))
+    img.alpha_composite(m.filter(ImageFilter.GaussianBlur(P(2.5))))
+    parts = [('ПРОГНОЗИ', WHITE), (' • ', LIME), ('СТАТИСТИКА', WHITE), (' • ', LIME), ('РЕЗУЛЬТАТИ', WHITE)]
+    f = font('s', 15.5); tmp = Image.new('RGBA', (P(420), P(40)), (0, 0, 0, 0)); td = ImageDraw.Draw(tmp)
+    x = P(4); sp = P(1.3)
+    for t, c in parts:
+        for ch in t:
+            td.text((x, P(8)), ch, font=f, fill=c + (255,)); x += td.textlength(ch, font=f) + sp
+    tmp = tmp.crop((0, 0, int(x) + P(6), P(40)))
+    tmp = tmp.transform(tmp.size, Image.AFFINE, (1, .16, -.16 * P(20), 0, 1, 0), resample=Image.BICUBIC)
+    tmp = tmp.rotate(4.4, resample=Image.BICUBIC, expand=True)
+    sc = min(1, P(340) / tmp.size[0]); tmp = tmp.resize((int(tmp.size[0] * sc), int(tmp.size[1] * sc)), Image.LANCZOS)
+    img.alpha_composite(tmp, (P(46), P(186) - tmp.size[1] + P(8)))
+
 def coins(d, x, y, col):
     for k in range(3): d.ellipse([x, y + P(14) - k * P(7), x + P(26), y + P(24) - k * P(7)], fill=col, outline=(90, 70, 0), width=int(P(1)))
 
@@ -206,6 +223,7 @@ def render(e, out):
     W = P(BW); img = Image.new('RGBA', (W, P(H)), (3, 6, 6, 255))
     tpl = Image.open(TPL).convert('RGBA').resize((W, P(1280)), Image.LANCZOS)
     img.alpha_composite(tpl.crop((0, 0, W, P(HEAD))), (0, 0))
+    ua_subtitle(img)
     # middle background: dark with soft side glows
     g = layer(W, P(H)); gd = ImageDraw.Draw(g)
     gd.ellipse([-P(250), P(HEAD + 40), P(180), P(HEAD + mid_h)], fill=(90, 200, 30, 60))
