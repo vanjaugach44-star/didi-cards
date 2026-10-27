@@ -2,6 +2,7 @@
 # Usage: python3 cards.py SPEC.json OUT_DIR   (SPEC.json = {"spec": "<string from n8n>", "hash": "<hex>"})
 import os, sys, json, math, random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from club_logos import draw_logo
 import sys
 
 S = 2
@@ -262,8 +263,10 @@ def render(e, out):
         d = ImageDraw.Draw(img); f = font('k', 22); tw = d.textlength(str(i + 1), font=f); d.text((P(31) - tw / 2, P(y + RH / 2 - 15)), str(i + 1), font=f, fill=WHITE)
         flag(d, P(58), P(y + 10), L['flag'])
         d.text((P(98), P(y + 11)), L['league'], font=font('s', 12.5), fill=WHITE)
-        badge(img, P(92), P(y + 76), P(30), L['h'][1], L['h'][2], L['h'][3] if len(L['h']) > 3 else 'solid')
-        badge(img, P(176), P(y + 76), P(30), L['a'][1], L['a'][2], L['a'][3] if len(L['a']) > 3 else 'solid')
+        if not draw_logo(img, P(92), P(y + 76), P(68), L.get('home_logo')):
+            badge(img, P(92), P(y + 76), P(30), L['h'][1], L['h'][2], L['h'][3] if len(L['h']) > 3 else 'solid')
+        if not draw_logo(img, P(176), P(y + 76), P(68), L.get('away_logo')):
+            badge(img, P(176), P(y + 76), P(30), L['a'][1], L['a'][2], L['a'][3] if len(L['a']) > 3 else 'solid')
         d = ImageDraw.Draw(img)
         d.text((P(228), P(y + 38)), L['time'], font=font('m', 12.5), fill=(200, 205, 210))
         for k, nm in enumerate((L['home'], L['away'])):
@@ -315,7 +318,9 @@ def render(e, out):
     bg = tpl.getpixel((P(390), P(1150)))[:3]
     pl = layer(W, P(H)); ImageDraw.Draw(pl).rectangle([P(206), P(fy + 1158), P(382), P(fy + 1223)], fill=bg + (255,)); img.alpha_composite(pl.filter(ImageFilter.GaussianBlur(P(4))))
     d = ImageDraw.Draw(img)
-    for k, s in enumerate(['СТАВ РОЗУМНО', 'СТЕЖ ЗА СТАТИСТИКОЮ', 'БУДЬ У ПЛЮСІ']): d.text((P(208), P(fy + 1162 + k * 20)), s, font=font('m', 13), fill=(225, 230, 235))
+    for k, s in enumerate(['СТАВ РОЗУМНО', 'СТЕЖ ЗА СТАТИСТИКОЮ', 'СТАТИСТИКА БЕЗ ПРИКРАС']):
+        ff, _ = fit_font(d, s, P(174), P(15), 'm', 13)
+        d.text((P(208), P(fy + 1162 + k * 20)), s, font=ff, fill=(225, 230, 235))
     bn = layer(W, P(H)); bd = ImageDraw.Draw(bn)
     bd.polygon([(P(522), P(fy + 1178)), (P(752), P(fy + 1146)), (P(760), P(fy + 1206)), (P(530), P(fy + 1236))], fill=(196, 240, 40, 255))
     img.alpha_composite(bn)
@@ -324,6 +329,10 @@ def render(e, out):
         tw = td.textlength(s, font=f); td.text((P(640) - tw / 2, P(fy + 1170 + k * 24)), s, font=f, fill=(12, 16, 10, 255))
     tl = tl.rotate(8, center=(P(640), P(fy + 1192)), resample=Image.BICUBIC)
     img.alpha_composite(tl)
-    d = ImageDraw.Draw(img); d.text((P(26), P(fy + 1258)), 'Умовна ставка · статистика DIDI · 18+', font=font('m', 11), fill=(170, 180, 175))
+    rrect(img, [P(18), P(fy + 1243), P(835), P(fy + 1278)], P(7), (7, 15, 18, 250), (178, 255, 46, 100), P(1))
+    d = ImageDraw.Draw(img)
+    note = 'УМОВНА СТАВКА · ' + e['stake'] + ' · СТАТИСТИКА DIDI · 18+'
+    ff, bb = fit_font(d, note, P(775), P(19), 'b', 16)
+    d.text(((W - d.textlength(note, font=ff)) / 2, P(fy + 1260) - (bb[1] + bb[3]) / 2), note, font=ff, fill=WHITE)
     img.convert('RGB').save(out, quality=95)
 

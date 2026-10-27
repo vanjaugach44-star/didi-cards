@@ -5,6 +5,7 @@
 import os, sys, json, hashlib, colorsys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import render_lib as R
+from editorial_cards import render_single
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 RAW = 'https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/'
@@ -68,7 +69,10 @@ def main(path):
         e = {'date_long': c['date_long'], 'stake': c['stake'], 'total': c['total'], 'potential': c['potential'],
              'result': c['result'], 'status': c['status'] == 'won', 'legs': legs}
         name = f'{i:02d}-{c["kind"]}.jpg'
-        R.render(e, os.path.join(out_dir, name))
+        if len(legs) == 1:
+            render_single(e, os.path.join(out_dir, name))
+        else:
+            R.render(e, os.path.join(out_dir, name))
         images.append(RAW + f'cards/{date}/{name}')
     d = date.split('-'); won = sum(c['status'] == 'won' for c in spec['cards'])
     caption = f'📊 Результати DIDI за {d[2]}.{d[1]}: {won} з {len(spec["cards"])} зайшло\n<i>Умовні ставки по 100 € · уся статистика без вибірок</i>'
