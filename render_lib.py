@@ -174,6 +174,27 @@ def plate(img, x, y, w, h, code, c1, c2):
     tw = d.textlength(code, font=f)
     d.text((x + (w - tw) / 2, y + (h - P(9)) / 2 - (bb[1] + bb[3]) / 2), code, font=f, fill=(255, 255, 255), stroke_width=P(1.5), stroke_fill=(0, 0, 0))
 
+def badge(img, cx, cy, r, c1, c2, style='solid'):
+    """Round club-colour badge (no crest): stripes/hoops/halves in the club's two colours, outer ring, gloss."""
+    W, H = img.size
+    sh = layer(W, H); ImageDraw.Draw(sh).ellipse([cx - r, cy - r + P(3), cx + r, cy + r + P(3)], fill=(0, 0, 0, 150)); img.alpha_composite(sh.filter(ImageFilter.GaussianBlur(P(4))))
+    b = layer(W, H); d = ImageDraw.Draw(b); d.rectangle([cx - r, cy - r, cx + r, cy + r], fill=c1 + (255,))
+    if style == 'stripes':
+        w = 2 * r / 5
+        for k in (1, 3): d.rectangle([cx - r + k * w, cy - r, cx - r + (k + 1) * w, cy + r], fill=c2 + (255,))
+    elif style == 'hoops':
+        w = 2 * r / 5
+        for k in (1, 3): d.rectangle([cx - r, cy - r + k * w, cx + r, cy - r + (k + 1) * w], fill=c2 + (255,))
+    elif style == 'half':
+        d.rectangle([cx, cy - r, cx + r, cy + r], fill=c2 + (255,))
+    else:
+        d.polygon([(cx - r, cy + r * .35), (cx + r, cy - r * .55), (cx + r, cy - r * .2), (cx - r, cy + r * .7)], fill=c2 + (255,))
+    m = Image.new('L', (W, H), 0); ImageDraw.Draw(m).ellipse([cx - r, cy - r, cx + r, cy + r], fill=255)
+    out = layer(W, H); out.paste(b, (0, 0), m); img.alpha_composite(out)
+    hl = layer(W, H); ImageDraw.Draw(hl).ellipse([cx - r * .7, cy - r * .9, cx + r * .5, cy - r * .1], fill=(255, 255, 255, 55)); hl2 = layer(W, H); hl2.paste(hl.filter(ImageFilter.GaussianBlur(P(3))), (0, 0), m); img.alpha_composite(hl2)
+    d = ImageDraw.Draw(img); d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(255, 255, 255, 230), width=int(P(2.5)))
+    d.ellipse([cx - r - P(3), cy - r - P(3), cx + r + P(3), cy + r + P(3)], outline=(0, 0, 0, 160), width=int(P(1.5)))
+
 def coins(d, x, y, col):
     for k in range(3): d.ellipse([x, y + P(14) - k * P(7), x + P(26), y + P(24) - k * P(7)], fill=col, outline=(90, 70, 0), width=int(P(1)))
 
@@ -223,12 +244,13 @@ def render(e, out):
         d = ImageDraw.Draw(img); f = font('k', 22); tw = d.textlength(str(i + 1), font=f); d.text((P(31) - tw / 2, P(y + RH / 2 - 15)), str(i + 1), font=f, fill=WHITE)
         flag(d, P(58), P(y + 10), L['flag'])
         d.text((P(98), P(y + 11)), L['league'], font=font('s', 12.5), fill=WHITE)
-        plate(img, P(58), P(y + 46), P(72), P(52), L['h'][0], L['h'][1], L['h'][2])
-        plate(img, P(140), P(y + 46), P(72), P(52), L['a'][0], L['a'][1], L['a'][2])
+        badge(img, P(92), P(y + 76), P(30), L['h'][1], L['h'][2], L['h'][3] if len(L['h']) > 3 else 'solid')
+        badge(img, P(176), P(y + 76), P(30), L['a'][1], L['a'][2], L['a'][3] if len(L['a']) > 3 else 'solid')
         d = ImageDraw.Draw(img)
-        d.text((P(228), P(y + 40)), L['time'], font=font('m', 12.5), fill=(200, 205, 210))
-        d.text((P(228), P(y + 62)), L['home'], font=font('x', 19), fill=WHITE)
-        d.text((P(228), P(y + 90)), L['away'], font=font('x', 19), fill=WHITE)
+        d.text((P(228), P(y + 38)), L['time'], font=font('m', 12.5), fill=(200, 205, 210))
+        for k, nm in enumerate((L['home'], L['away'])):
+            f, bb = fit_font(d, nm, P(210), P(24), 'x', 21)
+            d.text((P(228), P(y + 60 + k * 30)), nm, font=f, fill=WHITE)
         mx0, mx1 = 446, 690
         rrect(img, [P(mx0), P(y + 10), P(mx1), P(y + 70)], P(8), (8, 10, 14, 230), (120, 130, 140, 80), P(1.5))
         d = ImageDraw.Draw(img); d.text((P(mx0 + 12), P(y + 17)), L['mtype'], font=font('s', 12), fill=(220, 225, 230))

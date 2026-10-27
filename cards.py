@@ -34,13 +34,18 @@ CLUBS = {
  'Полісся': ('ПОЛ', GR, Y), 'Кривбас': ('КРИ', RD, W), 'Олександрія': ('ОЛЕ', Y, K), 'Карпати': ('КАР', GR, W), 'Зоря': ('ЗОР', K, W), 'Колос': ('КОЛ', Y, GR),
 }
 
+STRIPES = {'Ювентус', 'Інтер', 'Мілан', 'Барселона', 'Атлетіко Мадрид', 'Атлетік Більбао', 'Ньюкасл', 'Брентфорд', 'Сандерленд', 'Удінезе', 'Аталанта', 'Брюгге', 'Шахтар', 'ПСВ', 'Феєнорд', 'Болонья', 'Дженоа', 'Кальярі'}
+HOOPS = {'Селтік'}
+HALF = set()
+
 def club(name):
-    if name in CLUBS: return CLUBS[name]
+    st = 'stripes' if name in STRIPES else 'hoops' if name in HOOPS else 'half' if name in HALF else 'solid'
+    if name in CLUBS: return CLUBS[name] + (st,)
     letters = [c for c in name.upper() if c.isalpha()]
     code = ''.join(letters[:3]) or '???'
     h = int(hashlib.md5(name.encode('utf-8')).hexdigest()[:6], 16)
     r, g, b = colorsys.hsv_to_rgb((h % 360) / 360, 0.75, 0.75)
-    return (code, (int(r * 255), int(g * 255), int(b * 255)), W)
+    return (code, (int(r * 255), int(g * 255), int(b * 255)), W, 'solid')
 
 def djb2(s):
     h = 5381
