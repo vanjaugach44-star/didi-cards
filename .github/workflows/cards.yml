@@ -1,0 +1,66 @@
+name: Нічні картки DIDI
+
+# Щоночі бере заготовку дня з n8n, малює картки (cards.py) і комітить їх.
+# n8n-процес «DIDI · картки в канал» потім публікує їх у канал.
+# Час у UTC: 23:05 і 23:40 UTC = 01:05 і 01:40 за Києвом (взимку).
+on:
+  schedule:
+    - cron: '5 23 * * *'
+    - cron: '40 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cards
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Pillow
+        run: pip install pillow
+
+      - name: Заготовка з n8n
+        id: spec
+        run: |
+          curl -fsS --retry 3 --retry-delay 10 -m 30 \
+            "https://ivan-football.app.n8n.cloud/webhook/didi-card-spec" -o spec.json
+          python3 - <<'PY'
+          import json, os
+          box = json.load(open('spec.json', encoding='utf-8'))
+          date = json.loads(box['spec'])['date'] if box.get('spec') else ''
+          done = ''
+          if os.path.exists('cards/latest.json'):
+              done = json.load(open('cards/latest.json', encoding='utf-8')).get('date', '')
+          todo = 'yes' if date and date != done else 'no'
+          print(f'spec date={date or "-"}, already rendered={done or "-"}, render={todo}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f'date={date}\ntodo={todo}\n')
+          PY
+
+      - name: Малюємо картки
+        if: steps.spec.outputs.todo == 'yes'
+        run: python3 cards.py spec.json
+
+      - name: Коміт
+        if: steps.spec.outputs.todo == 'yes'
+        run: |
+          git config user.name "DIDI cards bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add cards
+          git commit -m "Картки ${{ steps.spec.outputs.date }}"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1
