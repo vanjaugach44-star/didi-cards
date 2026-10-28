@@ -39,7 +39,7 @@ jobs:
           today=$(TZ=Europe/Kyiv date +%F)
           done=$(python3 -c "import json;print(json.load(open('matches/latest.json')).get('date',''))" 2>/dev/null || true)
           echo "today=$today" >> "$GITHUB_OUTPUT"
-          if [ "$done" = "$today" ]; then echo "todo=no" >> "$GITHUB_OUTPUT"; else echo "todo=yes" >> "$GITHUB_OUTPUT"; fi
+          if [ "$done" = "$today" ] && [ "${{ github.event_name }}" != "push" ]; then echo "todo=no" >> "$GITHUB_OUTPUT"; else echo "todo=yes" >> "$GITHUB_OUTPUT"; fi
 
       - name: Малюємо
         if: steps.check.outputs.todo == 'yes'

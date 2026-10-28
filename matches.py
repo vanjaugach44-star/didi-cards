@@ -39,7 +39,7 @@ MONTHS = ['січня', 'лютого', 'березня', 'квітня', 'тр�
 DAYS = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П’ятниця', 'Субота', 'Неділя']
 
 # ---- team names -------------------------------------------------------------
-STRIP = {'fc', 'cf', 'afc', 'ac', 'sc', 'fk', 'sk', 'tc', 'nk', 'kf', 'cd', 'ud', 'sd', 'rc', 'rcd', 'as', 'ssc', 'sv', 'vfl', 'vfb', 'tsg',
+STRIP = {'fc', 'cf', 'afc', 'ac', 'sc', 'ssv', 'tsv', 'spvgg', 'vfr', 'fk', 'sk', 'tc', 'nk', 'kf', 'cd', 'ud', 'sd', 'rc', 'rcd', 'as', 'ssc', 'sv', 'vfl', 'vfb', 'tsg',
          'fsv', 'ogc', 'losc', 'bk', 'if', 'ff', 'kv', 'krc', 'kaa', 'bsc', 'sl', 'hnk', 'gnk'}
 
 def norm(v):
@@ -142,6 +142,12 @@ def put_logo(img, cx, cy, size, url, name):
     im = logo(url)
     if im is not None:
         im = ImageOps.contain(im, (int(size), int(size)), Image.Resampling.LANCZOS)
+        # Dark crests (Juventus etc.) get a light disc so they stay visible on the dark card.
+        px = [p for p in im.getdata() if p[3] > 128]
+        if px and sum(0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2] for p in px) / len(px) < 80:
+            r = size * 0.56
+            ImageDraw.Draw(img).ellipse([cx - r, cy - r, cx + r, cy + r], fill=(232, 238, 232, 255))
+            im = ImageOps.contain(im, (int(size * 0.8), int(size * 0.8)), Image.Resampling.LANCZOS)
         img.alpha_composite(im, (round(cx - im.width / 2), round(cy - im.height / 2))); return
     try:
         from cards import club
