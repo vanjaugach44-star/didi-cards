@@ -8,6 +8,9 @@ on:
     - cron: '35 7 * * *'
     - cron: '5 8 * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['matches.py', '.github/workflows/matches.yml']
 
 permissions:
   contents: write
