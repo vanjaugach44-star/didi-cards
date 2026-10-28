@@ -34,6 +34,7 @@ jobs:
         id: spec
         run: |
           curl -fsS --retry 3 --retry-delay 10 -m 30 \
+            -A "Mozilla/5.0 (DIDI cards)" \
             "https://ivan-football.app.n8n.cloud/webhook/didi-card-spec" -o spec.json
           python3 - <<'PY'
           import json, os
