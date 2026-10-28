@@ -331,7 +331,7 @@ def render(e, out):
     img.alpha_composite(tl)
     rrect(img, [P(18), P(fy + 1243), P(835), P(fy + 1278)], P(7), (7, 15, 18, 250), (178, 255, 46, 100), P(1))
     d = ImageDraw.Draw(img)
-    note = 'УМОВНА СТАВКА · ' + e['stake'] + ' · СТАТИСТИКА DIDI · 18+'
+    note = 'СТАВКА · ' + e['stake'] + ' · СТАТИСТИКА DIDI · 18+'
     ff, bb = fit_font(d, note, P(775), P(19), 'b', 16)
     d.text(((W - d.textlength(note, font=ff)) / 2, P(fy + 1260) - (bb[1] + bb[3]) / 2), note, font=ff, fill=WHITE)
     img.convert('RGB').save(out, quality=95)

@@ -56,7 +56,7 @@ def render_single(e, path):
     R.rrect(img,[P(36),P(862),P(817),P(954)],P(12),(13,30,23,255) if won else (38,17,22,255),color+(160,),P(1))
     text(img,'ВИГРАШ' if won else 'ПРОГРАШ',58,892,27,color,width=360)
     text(img,e['result'],670,882,45,color,width=250,center=True,kind='k')
-    footer(img,'УМОВНА СТАВКА · '+e['stake']+' · НЕ РЕАЛЬНІ ГРОШІ')
+    footer(img,'СТАВКА НА МАТЧ · '+e['stake'])
     save(img,path)
 
 
@@ -74,7 +74,7 @@ def render_daily(data,path):
         text(img,row['teams'],54,y+16,24,width=580)
         text(img,row['score'],54,y+52,18,R.MUTED,width=580)
         text(img,row['profit'],715,y+29,28,R.GREEN if row['positive'] else R.RED,width=160,center=True)
-    footer(img,'РЕЗУЛЬТАТ УМОВНИХ СТАВОК · 1 ОД. = ОДНАКОВА СТАВКА')
+    footer(img,'РЕЗУЛЬТАТ СТАВОК · 1 ОД. = ОДНАКОВА СТАВКА')
     save(img,path)
 
 
@@ -87,5 +87,5 @@ def render_models(data,path):
         for x,label,value in [(58,'ЗІГРАЛО',m['record']),(320,'РЕЗУЛЬТАТ',m['profit']),(610,'ROI',m['roi'])]:
             text(img,label,x,y+77,16,R.MUTED,width=230)
             text(img,value,x,y+112,32,R.LIME,width=230,kind='k')
-    footer(img,'УМОВНІ СТАВКИ · РІЗНА КІЛЬКІСТЬ ПРОГНОЗІВ У МОДЕЛЕЙ')
+    footer(img,'РІЗНА КІЛЬКІСТЬ ПРОГНОЗІВ У МОДЕЛЕЙ')
     save(img,path)

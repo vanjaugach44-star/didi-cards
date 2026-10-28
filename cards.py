@@ -75,7 +75,7 @@ def main(path):
             R.render(e, os.path.join(out_dir, name))
         images.append(RAW + f'cards/{date}/{name}')
     d = date.split('-'); won = sum(c['status'] == 'won' for c in spec['cards'])
-    caption = f'📊 Результати DIDI за {d[2]}.{d[1]}: {won} з {len(spec["cards"])} зайшло\n<i>Умовні ставки по 1 000 € на кожен матч · уся статистика без вибірок</i>'
+    caption = f'📊 Результати DIDI за {d[2]}.{d[1]}: {won} з {len(spec["cards"])} зайшло\n<i>Ставка 1 000 € на кожен матч · уся статистика без вибірок</i>'
     json.dump({'date': date, 'images': images, 'caption': caption}, open(os.path.join(BASE, 'cards', 'latest.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print(f'{len(images)} cards for {date} written to {out_dir}')
 
