@@ -107,9 +107,23 @@ def collect(date):
                         'home': uk_name(h['team']), 'away': uk_name(a['team']), 'home_logo': h['team'].get('logo'), 'away_logo': a['team'].get('logo')})
     return out
 
+KNOWN = set(MAP.values())
+CUPS = {'eng.league_cup', 'eng.fa', 'ger.dfb_pokal', 'ita.coppa_italia', 'esp.copa_del_rey'}
+PER_LEAGUE = 6
+
 def pick(matches):
-    for m in matches: m['score'] = m['prio'] + 15 * sum(x in BIG for x in (m['home'], m['away']))
-    top = sorted(matches, key=lambda m: -m['score'])[:MAX_MATCHES]
+    # Cup ties need at least one club we know (top-flight); amateur v amateur is dropped. Big clubs first, max 6 per tournament.
+    pool = []
+    for m in matches:
+        known = sum(x in KNOWN for x in (m['home'], m['away']))
+        if m['league'] in CUPS and not known: continue
+        m['score'] = m['prio'] + 15 * sum(x in BIG for x in (m['home'], m['away'])) + 6 * known
+        pool.append(m)
+    top, per = [], {}
+    for m in sorted(pool, key=lambda m: -m['score']):
+        if per.get(m['league'], 0) >= PER_LEAGUE: continue
+        per[m['league']] = per.get(m['league'], 0) + 1; top.append(m)
+        if len(top) >= MAX_MATCHES: break
     order = {c: i for i, (c, *_r) in enumerate(LEAGUES)}
     return sorted(top, key=lambda m: (min(x['ts'] for x in top if x['league'] == m['league']), order[m['league']], m['ts']))
 
