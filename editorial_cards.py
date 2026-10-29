@@ -38,7 +38,7 @@ def save(img, path):
 
 def render_single(e, path):
     L = e['legs'][0]
-    img = base('РЕЗУЛЬТАТ МАТЧУ', e['date_long'])
+    img = base(e.get('title') or 'РЕЗУЛЬТАТ МАТЧУ', e['date_long'])
     R.flag(ImageDraw.Draw(img),P(36),P(337),L['flag'])
     text(img,L['league'],84,340,17)
     for cx, side, name, url in [(248,'h',L['home'],L.get('home_logo')),(605,'a',L['away'],L.get('away_logo'))]:

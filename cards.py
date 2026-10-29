@@ -67,7 +67,7 @@ def main(path):
         for L in c['legs']:
             legs.append({**L, 'h': club(L['home']), 'a': club(L['away'])})
         e = {'date_long': c['date_long'], 'stake': c['stake'], 'total': c['total'], 'potential': c['potential'],
-             'result': c['result'], 'status': c['status'] == 'won', 'legs': legs}
+             'result': c['result'], 'status': c['status'] == 'won', 'legs': legs, 'title': c.get('title')}
         name = f'{i:02d}-{c["kind"]}.jpg'
         if len(legs) == 1:
             render_single(e, os.path.join(out_dir, name))
@@ -76,7 +76,9 @@ def main(path):
         images.append(RAW + f'cards/{date}/{name}')
     d = date.split('-'); won = sum(c['status'] == 'won' for c in spec['cards'])
     caption = f'📊 Результати DIDI за {d[2]}.{d[1]}: {won} з {len(spec["cards"])} зайшло\n<i>Ставка 1 000 € на кожен матч · уся статистика без вибірок</i>'
-    json.dump({'date': date, 'images': images, 'caption': caption}, open(os.path.join(BASE, 'cards', 'latest.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    out = {'date': date, 'images': images, 'caption': box.get('caption') or caption}
+    if box.get('key'): out['key'] = box['key']
+    json.dump(out, open(os.path.join(BASE, 'cards', 'latest.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print(f'{len(images)} cards for {date} written to {out_dir}')
 
 if __name__ == '__main__':

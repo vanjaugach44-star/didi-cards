@@ -8,6 +8,11 @@ on:
     - cron: '5 23 * * *'
     - cron: '40 23 * * *'
   workflow_dispatch:
+    inputs:
+      spec_file:
+        description: 'Готова заготовка в репозиторії (extra/...json) замість n8n'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -30,8 +35,25 @@ jobs:
       - name: Pillow
         run: pip install pillow
 
+      - name: Заготовка з файлу
+        id: extra
+        if: github.event.inputs.spec_file != ''
+        run: |
+          cp "${{ github.event.inputs.spec_file }}" spec.json
+          python3 cards.py spec.json
+          git config user.name "DIDI cards bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add cards
+          git commit -m "Картки з ${{ github.event.inputs.spec_file }}"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1
+
       - name: Заготовка з n8n
         id: spec
+        if: github.event.inputs.spec_file == ''
         run: |
           curl -fsS --retry 3 --retry-delay 10 -m 30 \
             -A "Mozilla/5.0 (DIDI cards)" \
