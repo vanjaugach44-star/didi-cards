@@ -1,10 +1,11 @@
 {
  "date": "2026-10-28",
  "images": [
-  "https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/cards/2026-10-28/01-single.jpg",
-  "https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/cards/2026-10-28/02-single.jpg",
-  "https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/cards/2026-10-28/03-single.jpg",
-  "https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/cards/2026-10-28/04-single.jpg"
+  "https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/cards/2026-10-28/01-ai.jpg",
+  "https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/cards/2026-10-28/02-ai.jpg",
+  "https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/cards/2026-10-28/03-ai.jpg",
+  "https://raw.githubusercontent.com/vanjaugach44-star/didi-cards/main/cards/2026-10-28/04-ai.jpg"
  ],
- "caption": "📊 Результати DIDI за 28.10: 3 з 4 зайшло\n<i>Ставка 1 000 € на кожен матч · уся статистика без вибірок</i>"
+ "caption": "🤖 Прогнози ШІ за 28.10.2026: 4 з 4 зайшло\nОкрема статистика штучного інтелекту, не входить у прохідність наших ординарів.\n💶 Приклад розрахунку на 1 000 € за кожну ставку; це не звіт про фактичні гроші.",
+ "key": "2026-10-28-ai"
 }
