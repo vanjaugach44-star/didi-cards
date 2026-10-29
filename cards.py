@@ -61,7 +61,7 @@ def main(path):
         sys.exit(f'Checksum mismatch: expected {want}, got {got}. The spec was not copied exactly.')
     spec = json.loads(spec_str)
     date = spec['date']; out_dir = os.path.join(BASE, 'cards', date); os.makedirs(out_dir, exist_ok=True)
-    images = []
+    images = []; tags = []
     for i, c in enumerate(spec['cards'], 1):
         legs = []
         for L in c['legs']:
@@ -74,9 +74,10 @@ def main(path):
         else:
             R.render(e, os.path.join(out_dir, name))
         images.append(RAW + f'cards/{date}/{name}')
+        tags.append(' '.join(dict.fromkeys(f"#DIDI_m{L['fid']}" for L in c['legs'] if L.get('fid'))))
     d = date.split('-'); won = sum(c['status'] == 'won' for c in spec['cards'])
     caption = f'📊 Результати DIDI за {d[2]}.{d[1]}: {won} з {len(spec["cards"])} зайшло\n<i>Ставка 1 000 € на кожен матч · уся статистика без вибірок</i>'
-    out = {'date': date, 'images': images, 'caption': box.get('caption') or caption}
+    out = {'date': date, 'images': images, 'tags': tags, 'caption': box.get('caption') or caption}
     if box.get('key'): out['key'] = box['key']
     json.dump(out, open(os.path.join(BASE, 'cards', 'latest.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print(f'{len(images)} cards for {date} written to {out_dir}')
