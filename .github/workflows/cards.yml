@@ -2,11 +2,13 @@ name: Нічні картки DIDI
 
 # Щоночі бере заготовку дня з n8n, малює картки (cards.py) і комітить їх.
 # n8n-процес «DIDI · картки в канал» потім публікує їх у канал.
-# Час у UTC: 23:05 і 23:40 UTC = 01:05 і 01:40 за Києвом (взимку).
+# Підготовка до публікації о 23:45 Europe/Brussels.
 on:
   schedule:
-    - cron: '5 23 * * *'
-    - cron: '40 23 * * *'
+    - cron: '25 23 * * *'
+      timezone: 'Europe/Brussels'
+    - cron: '35 23 * * *'
+      timezone: 'Europe/Brussels'
   workflow_dispatch:
     inputs:
       spec_file:
