@@ -31,8 +31,96 @@ LEAGUES = [
     ('ger.dfb_pokal', 'DE', 'НІМЕЧЧИНА · КУБОК НІМЕЧЧИНИ', 74), ('ita.coppa_italia', 'IT', 'ІТАЛІЯ · КУБОК ІТАЛІЇ', 73),
     ('esp.copa_del_rey', 'ES', 'ІСПАНІЯ · КУБОК КОРОЛЯ', 73), ('por.1', 'PT', 'ПОРТУГАЛІЯ · ПРІМЕЙРА', 66),
     ('ned.1', 'NL', 'НІДЕРЛАНДИ · ЕРЕДИВІЗІ', 63), ('bel.1', 'BE', 'БЕЛЬГІЯ · ПРО-ЛІГА', 61),
+    # Збірні: у перерви на збірні клубних матчів майже немає, тож без цього картинка порожня.
+    ('uefa.nations', 'EU', 'ЛІГА НАЦІЙ УЄФА', 95), ('fifa.worldq.uefa', 'EU', 'ВІДБІР ДО ЧС · ЄВРОПА', 88),
+    ('uefa.euroq', 'EU', 'ВІДБІР ДО ЄВРО', 88), ('fifa.friendly', 'WW', 'ТОВАРИСЬКІ МАТЧІ ЗБІРНИХ', 70),
+    ('conmebol.worldq', 'WW', 'ВІДБІР ДО ЧС · ПІВД. АМЕРИКА', 68),
+    # Другі дивізіони та інші ліги, з яких DIDI бере прогнози.
+    ('esp.2', 'ES', 'ІСПАНІЯ · СЕГУНДА', 58), ('ita.2', 'IT', 'ІТАЛІЯ · СЕРІЯ B', 57), ('eng.2', 'EN', 'АНГЛІЯ · ЧЕМПІОНШИП', 59),
+    ('ger.2', 'DE', 'НІМЕЧЧИНА · БУНДЕСЛІГА 2', 57), ('fra.2', 'FR', 'ФРАНЦІЯ · ЛІГА 2', 56), ('tur.1', 'TR', 'ТУРЕЧЧИНА · СУПЕРЛІГА', 55),
 ]
-BIG = {'Реал Мадрид', 'Барселона', 'Атлетіко Мадрид', 'Манчестер Сіті', 'Ліверпуль', 'Арсенал', 'Челсі', 'Манчестер Юнайтед',
+NATIONS = '''Україна=Ukraine
+Англія=England
+Іспанія=Spain
+Франція=France
+Німеччина=Germany
+Італія=Italy
+Португалія=Portugal
+Нідерланди=Netherlands
+Бельгія=Belgium
+Хорватія=Croatia
+Данія=Denmark
+Швейцарія=Switzerland
+Австрія=Austria
+Польща=Poland
+Чехія=Czechia;Czech Republic
+Словаччина=Slovakia
+Угорщина=Hungary
+Румунія=Romania
+Сербія=Serbia
+Греція=Greece
+Туреччина=Turkey;Türkiye
+Швеція=Sweden
+Норвегія=Norway
+Фінляндія=Finland
+Ісландія=Iceland
+Шотландія=Scotland
+Уельс=Wales
+Ірландія=Republic of Ireland;Ireland
+Північна Ірландія=Northern Ireland
+Албанія=Albania
+Болгарія=Bulgaria
+Боснія і Герцеговина=Bosnia and Herzegovina;Bosnia-Herzegovina
+Грузія=Georgia
+Вірменія=Armenia
+Азербайджан=Azerbaijan
+Казахстан=Kazakhstan
+Словенія=Slovenia
+Північна Македонія=North Macedonia
+Чорногорія=Montenegro
+Косово=Kosovo
+Ізраїль=Israel
+Кіпр=Cyprus
+Люксембург=Luxembourg
+Латвія=Latvia
+Литва=Lithuania
+Естонія=Estonia
+Мальта=Malta
+Молдова=Moldova
+Білорусь=Belarus
+Фарерські острови=Faroe Islands
+Андорра=Andorra
+Сан-Марино=San Marino
+Ліхтенштейн=Liechtenstein
+Гібралтар=Gibraltar
+Бразилія=Brazil
+Аргентина=Argentina
+Уругвай=Uruguay
+Колумбія=Colombia
+Еквадор=Ecuador
+Парагвай=Paraguay
+Чилі=Chile
+Перу=Peru
+Венесуела=Venezuela
+Болівія=Bolivia
+Мексика=Mexico
+США=United States;USA
+Канада=Canada
+Японія=Japan
+Південна Корея=South Korea;Korea Republic
+Австралія=Australia
+Марокко=Morocco
+Сенегал=Senegal
+Єгипет=Egypt
+Нігерія=Nigeria
+Туніс=Tunisia
+Алжир=Algeria
+Іран=Iran
+Саудівська Аравія=Saudi Arabia
+Катар=Qatar'''
+
+BIG = {'Англія', 'Франція', 'Іспанія', 'Німеччина', 'Італія', 'Португалія', 'Нідерланди', 'Бельгія', 'Хорватія', 'Україна', 'Бразилія', 'Аргентина',
+       'Реал Мадрид', 'Барселона', 'Атлетіко Мадрид', 'Манчестер Сіті', 'Ліверпуль', 'Арсенал', 'Челсі', 'Манчестер Юнайтед',
        'Тоттенгем', 'Ньюкасл', 'Баварія', 'Боруссія Дортмунд', 'Баєр Леверкузен', 'ПСЖ', 'Інтер', 'Мілан', 'Ювентус', 'Наполі',
        'Рома', 'Аталанта', 'Бенфіка', 'Порту', 'Спортінг', 'Шахтар', 'Динамо Київ', 'Марсель', 'Аякс', 'ПСВ'}
 MONTHS = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня']
@@ -48,7 +136,7 @@ def norm(v):
     return ''.join(w for w in re.split(r'[^a-z0-9]+', s) if w and w not in STRIP and not w.isdigit())
 
 MAP = {}
-for line in DICT.strip().split('\n'):
+for line in (DICT.strip() + '\n' + NATIONS).split('\n'):
     if '=' not in line: continue
     uk, rest = line.split('=', 1)
     for a in rest.split(';'):

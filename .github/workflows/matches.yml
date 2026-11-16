@@ -37,7 +37,7 @@ jobs:
         id: check
         run: |
           today=$(TZ=Europe/Kyiv date +%F)
-          done=$(python3 -c "import json;print(json.load(open('matches/latest.json')).get('date',''))" 2>/dev/null || true)
+          done=$(python3 -c "import json;d=json.load(open('matches/latest.json'));print(d.get('date','') if d.get('count',0)>0 else '')" 2>/dev/null || true)
           echo "today=$today" >> "$GITHUB_OUTPUT"
           if [ "$done" = "$today" ] && [ "${{ github.event_name }}" != "push" ]; then echo "todo=no" >> "$GITHUB_OUTPUT"; else echo "todo=yes" >> "$GITHUB_OUTPUT"; fi
 
