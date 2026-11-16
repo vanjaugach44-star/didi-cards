@@ -191,10 +191,13 @@ def collect(date):
             cs = comp.get('competitors') or []
             h = next((c for c in cs if c.get('homeAway') == 'home'), None); a = next((c for c in cs if c.get('homeAway') == 'away'), None)
             if not h or not a: continue
+            if any(norm(t['team'].get('displayName')) in BANNED for t in (h, a)): continue
             out.append({'league': code, 'flag': flag, 'label': label, 'prio': prio, 'time': ko.strftime('%H:%M'), 'ts': ko.timestamp(),
                         'home': uk_name(h['team']), 'away': uk_name(a['team']), 'home_logo': h['team'].get('logo'), 'away_logo': a['team'].get('logo')})
     return out
 
+# Збірні/клуби країни-агресора не показуємо в українському каналі.
+BANNED = {norm('Russia'), norm('Belarus')}
 KNOWN = set(MAP.values())
 CUPS = {'eng.league_cup', 'eng.fa', 'ger.dfb_pokal', 'ita.coppa_italia', 'esp.copa_del_rey'}
 PER_LEAGUE = 6
