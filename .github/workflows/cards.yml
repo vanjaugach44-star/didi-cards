@@ -59,7 +59,7 @@ jobs:
         run: |
           curl -fsS --retry 3 --retry-delay 10 -m 30 \
             -A "Mozilla/5.0 (DIDI cards)" \
-            "https://ivan-football.app.n8n.cloud/webhook/didi-card-spec" -o spec.json
+            "https://didi-automation-production.up.railway.app/webhook/didi-card-spec" -o spec.json
           python3 - <<'PY'
           import json, os
           box = json.load(open('spec.json', encoding='utf-8'))
