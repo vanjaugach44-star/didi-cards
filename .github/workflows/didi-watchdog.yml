@@ -1,0 +1,33 @@
+name: DIDI watchdog
+
+# Каждые ~10 минут проверяет, что DD Automatic на Railway жив.
+# Если не отвечает: запуск помечается как упавший (GitHub пришлёт письмо)
+# и, если заданы секреты TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID, приходит сообщение в Telegram.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check DIDI health
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          ok=0
+          for i in 1 2 3; do
+            body=$(curl -fsS --max-time 20 https://didi-automation-production.up.railway.app/api/health) && echo "$body" | grep -q '"status":"ok"' && ok=1 && break
+            sleep 20
+          done
+          if [ "$ok" = 1 ]; then echo "DIDI OK"; exit 0; fi
+          if [ -n "$TG_TOKEN" ] && [ -n "$TG_CHAT" ]; then
+            curl -sS --max-time 20 "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+              --data-urlencode "chat_id=${TG_CHAT}" \
+              --data-urlencode "text=🚨 DD автоматик на Railway не отвечает. Проверь сервер." >/dev/null || true
+          fi
+          echo "DIDI DOWN"
+          exit 1
